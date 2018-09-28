@@ -16,26 +16,26 @@ config = config_reader(args.config)
 
 # do actions
 if args.precompute:
-	from precompute import *
-	print(":: precompute")
-	run_precompute(config)
+  from precompute import *
+  print(":: precompute")
+  run_precompute(config)
 
 if args.train:
-	from model import *
-	print(":: training")
-	run_net(config, "train")
+  from model import *
+  print(":: training")
+  run_net(config, "train")
 
 if args.test:
-	from model import *
-	print(":: testing")
-	run_net(config, "test")
+  from model import *
+  print(":: testing")
+  run_net(config, "test")
 
 if args.extrapolate:
-	from extrapolate import *
-	print(":: extrapolate")
-	run_extrapolate_labels(config)
+  from extrapolate import *
+  print(":: extrapolate")
+  run_extrapolate_labels(config)
 
 if args.evaluate:
-	from eval import *
-	print(":: evaluate")
-	run_eval(config)
+  from eval import *
+  print(":: evaluate")
+  run_eval(config)
