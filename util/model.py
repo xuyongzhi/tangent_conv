@@ -13,6 +13,8 @@ os.system('nvidia-smi -q -d Memory |grep -A4 GPU|grep Free >tmp')
 os.environ['CUDA_VISIBLE_DEVICES']=str(np.argmax([int(x.split()[2]) for x in open('tmp','r').readlines()]))
 os.system('rm tmp')
 
+DEBUG = True
+
 class param:
   def __init__(self, config):
     self.pre_output_dir = os.path.join(get_tc_path(), config['pre_output_dir'])
@@ -82,6 +84,8 @@ class model():
       self.test_scans = scans
 
     scans = [os.path.join(self.par.pre_output_dir, s.rstrip()) for s in scans]
+    if DEBUG:
+      scans = scans[0:5]
 
     cnt = 0
     for s_path in scans:
@@ -90,6 +94,9 @@ class model():
       else:
         rot = 0
       s = ScanData()
+
+      if DEBUG and not os.path.exists(s_path):
+        continue
       s.load(os.path.join(s_path, str(rot)), self.par.num_scales)
       s.remap_depth(vmin=-self.par.conv_rad[0], vmax=self.par.conv_rad[0])
       s.remap_normals()

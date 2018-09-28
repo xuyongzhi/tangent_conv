@@ -1,12 +1,15 @@
 import argparse
 parser = argparse.ArgumentParser(description='Tangent convolutions')
-parser.add_argument('config', type=str, metavar='N', help='config json file')
+#parser.add_argument('config', type=str,  metavar='N', help='config json file')
 parser.add_argument('--precompute', action="store_true", help='do precomputation')
 parser.add_argument('--train', action="store_true", help='do training network')
 parser.add_argument('--test', action="store_true", help='do testing network')
 parser.add_argument('--extrapolate', action="store_true", help='do extrapolate for the evaluation')
 parser.add_argument('--evaluate', action="store_true", help='do evaluation')
 args = parser.parse_args()
+
+args.config = './experiments/scannet/d/config.json'
+args.train = True
 
 # reading configuration files
 import os, sys

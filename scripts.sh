@@ -1,2 +1,4 @@
-config='././experiments/scannet/d/config.json'
-python3 tc.py $config  --precompute 
+config='./experiments/scannet/d/config.json'
+cmd=--precompute
+cmd=--train
+python3 tc.py $config $cmd
