@@ -6,5 +6,8 @@ tc_path = '/home/z/Research/tangent_conv/'
 sys.path.append(open3d_path)
 from py3d import *
 
+DEBUG_ = True
+SCANNUM_ = 5
+
 def get_tc_path():
 	return tc_path

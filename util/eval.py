@@ -89,6 +89,7 @@ def run_eval(config):
   with open(p.test_file) as f:
     scans = f.readlines()
     scans = [s.rstrip() for s in scans]
+    if DEBUG_: scans = scans[0:SCANNUM_]
 
     counter = 0
 

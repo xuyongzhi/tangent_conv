@@ -28,6 +28,7 @@ def run_extrapolate_labels(config):
   with open(p.test_file) as f:
     scans = f.readlines()
     scans = [s.rstrip() for s in scans]
+    if DEBUG_: scans = scans[0:SCANNUM_]
     for scan_name in scans:
       s = ScanData()
       s.load(os.path.join(p.experiment_dir, p.output_dir, scan_name), p.num_scales)
