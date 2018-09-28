@@ -1,7 +1,7 @@
 import sys
 
-open3d_path = '<your_path>/Open3D/build/lib/'
-tc_path = '<your_path>/tangent_convolutions/'
+open3d_path = '/home/z/Research/LIBS/Open3D/build/lib/'
+tc_path = '/home/z/Research/tangent_conv/'
 
 sys.path.append(open3d_path)
 from py3d import *
