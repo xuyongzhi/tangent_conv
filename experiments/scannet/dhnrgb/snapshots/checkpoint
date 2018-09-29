@@ -1,2 +1,2 @@
-model_checkpoint_path: "model-382000"
-all_model_checkpoint_paths: "model-382000"
+model_checkpoint_path: "/home/z/Research/tangent_conv/experiments/scannet/dhnrgb/snapshots/model-382000"
+all_model_checkpoint_paths: "/home/z/Research/tangent_conv/experiments/scannet/dhnrgb/snapshots/model-382000"

@@ -128,10 +128,10 @@ class model():
       return self.tr_batch_array[scan_num]
 
   def get_feed_dict(self, b):
-    bs = self.par.batch_size
+    bs = self.par.batch_size # 200000
 
-    mask1 = get_pooling_mask(b.pool_ind[1])
-    mask2 = get_pooling_mask(b.pool_ind[2])
+    mask1 = get_pooling_mask(b.pool_ind[1]) # (9944, 8)
+    mask2 = get_pooling_mask(b.pool_ind[2]) # (2529, 8)
 
     ret_dict = {self.c1_ind: expand_dim_to_batch2(b.conv_ind[0], bs),
           self.c2_ind: expand_dim_to_batch2(b.conv_ind[1], bs//2),
@@ -165,12 +165,12 @@ class model():
     input_list = []
     if 'd' in self.par.input_type:
       num_input_ch += 1
-      self.input_depth1 = tf.placeholder(tf.float32, [bs, fs*fs])
-      self.input_depth2 = tf.placeholder(tf.float32, [bs//2, fs*fs])
-      self.input_depth3 = tf.placeholder(tf.float32, [bs//4, fs*fs])
+      self.input_depth1 = tf.placeholder(tf.float32, [bs, fs*fs])     # (200000, 9)
+      self.input_depth2 = tf.placeholder(tf.float32, [bs//2, fs*fs])  # (100000, 9)
+      self.input_depth3 = tf.placeholder(tf.float32, [bs//4, fs*fs])  # (50000, 9)
     if 'n' in self.par.input_type:
       num_input_ch += 3
-      self.input_normals = tf.placeholder(tf.float32, [bs, 3])
+      self.input_normals = tf.placeholder(tf.float32, [bs, 3]) # (200000, 3)
       input_list.append(self.input_normals)
     if 'h' in self.par.input_type:
       num_input_ch += 1
@@ -181,9 +181,9 @@ class model():
       self.input_colors = tf.placeholder(tf.float32, [bs, 3])
       input_list.append(self.input_colors)
 
-    self.c1_ind = tf.placeholder(tf.int32, [bs, fs*fs])
-    self.p12_ind = tf.placeholder(tf.int32, [bs//2, 8])
-    self.p12_mask = tf.placeholder(tf.float32, [bs//2, 8])
+    self.c1_ind = tf.placeholder(tf.int32, [bs, fs*fs]) # (200000, 9) neighbor index
+    self.p12_ind = tf.placeholder(tf.int32, [bs//2, 8]) # (100000, 8)
+    self.p12_mask = tf.placeholder(tf.float32, [bs//2, 8]) # (100000, 8)
     self.c2_ind = tf.placeholder(tf.int32, [bs//2, fs*fs])
     self.p23_ind = tf.placeholder(tf.int32, [bs//4, 8])
     self.p23_mask = tf.placeholder(tf.float32, [bs//4, 8])
@@ -199,9 +199,9 @@ class model():
 
     if 'd' in self.par.input_type:
       if num_input_ch > 1:
-        signal_input = tf.concat(input_list, axis=1)
+        signal_input = tf.concat(input_list, axis=1) # (200000, 7)
         h_conv1 = lrelu(point_conv('conv1', signal_input, self.c1_ind,
-          fs*fs, num_input_ch, 32, extra_chan=self.input_depth1))
+          fs*fs, num_input_ch, 32, extra_chan=self.input_depth1)) # (200000, 32)
       else:
         signal_input = tf.expand_dims(tf.expand_dims(self.input_depth1, axis=2), axis=0)
         h_conv1 = lrelu(conv_2d_layer('conv1', signal_input, 1, 32, 1,
@@ -211,14 +211,14 @@ class model():
       h_conv1 = lrelu(point_conv('conv1', signal_input, self.c1_ind,
         fs*fs, num_input_ch, 32))
 
-    h_conv1 = tf.squeeze(h_conv1)
+    h_conv0 = tf.squeeze(h_conv1)
     h_conv11 = lrelu(point_conv('conv11', h_conv1, self.c1_ind,
-      fs*fs, 32, 32))
+      fs*fs, 32, 32)) # (200000, 32)
 
-    h_pool1 = point_pool(h_conv11, self.p12_ind, self.p12_mask)
+    h_pool1 = point_pool(h_conv11, self.p12_ind, self.p12_mask) # (100000, 32)
     if 'd' in self.par.input_type:
       h_conv2 = lrelu(point_conv('conv2', h_pool1, self.c2_ind, fs*fs, 33, 64,
-        extra_chan=self.input_depth2))
+        extra_chan=self.input_depth2)) # (100000, 64)
     else:
       h_conv2 = lrelu(point_conv('conv2', h_pool1, self.c2_ind, fs*fs, 32, 64))
     h_conv22 = lrelu(point_conv('conv22', h_conv2, self.c2_ind, fs*fs, 64, 64))
@@ -228,9 +228,9 @@ class model():
         extra_chan=self.input_depth3))
     else:
       h_conv3 = lrelu(point_conv('conv3', h_pool2, self.c3_ind, fs*fs, 64, 128))
-    h_conv33 = lrelu(point_conv('conv33', h_conv3, self.c3_ind, fs*fs, 128, 64))
-    h_unpool2 = point_unpool(h_conv33, self.p23_ind, shape_unpool2)
-    uconv2_in = tf.concat([h_conv22, h_unpool2], axis=1)
+    h_conv33 = lrelu(point_conv('conv33', h_conv3, self.c3_ind, fs*fs, 128, 64)) # (50000, 64)
+    h_unpool2 = point_unpool(h_conv33, self.p23_ind, shape_unpool2) # (100000, 64)
+    uconv2_in = tf.concat([h_conv22, h_unpool2], axis=1) # (100000, 128)
     h_uconv2 = lrelu(point_conv('uconv2', uconv2_in, self.c2_ind, fs*fs, 128, 64))
     h_uconv22 = lrelu(point_conv('uconv22', h_uconv2, self.c2_ind, fs*fs, 64, 32))
     h_unpool1 = point_unpool(h_uconv22, self.p12_ind, shape_unpool1)

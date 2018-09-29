@@ -15,13 +15,26 @@ def point_conv(name, input_tensor, index_tensor,
     return tf.squeeze(conv_output, [0, 2])
 
 def point_pool(input_tensor, index_tensor, pool_mask, pool_type='MAX'):
-  pool_input = tf.gather_nd(input_tensor, tf.expand_dims(index_tensor, axis=2))
+  '''
+  Mean pooling.
+    input_tensor:  (200000, 32)
+    index_tensor: (100000, 8)
+    pool_mask: (100000, 8)
+  '''
+  pool_input = tf.gather_nd(input_tensor, tf.expand_dims(index_tensor, axis=2)) # (100000, 8, 32)
   broadcast_mask = tf.tile(tf.expand_dims(pool_mask, axis=2),
-               tf.stack([1, 1, tf.shape(pool_input)[2]]))
+               tf.stack([1, 1, tf.shape(pool_input)[2]])) # (100000, 8, 32)
   return tf.reduce_sum(pool_input * broadcast_mask, axis=1)
 
 def point_unpool(input_tensor, index_tensor, output_shape, elem_count=8):
+  '''
+    When one point is scattered multiple times, use sum. What if the times per point is different?
+    Just assume almost same?
+
+    input_tensor: (50000, 64)
+    index_tensor: (50000, 8)
+  '''
   out = []
   for i in range(0, elem_count):
     out.append(tf.scatter_nd(tf.slice(index_tensor, [0, i], [-1, 1]), input_tensor, output_shape))
-  return tf.add_n(out)
+  return tf.add_n(out) # (100000, 64)

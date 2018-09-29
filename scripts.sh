@@ -1,4 +1,4 @@
-config='./experiments/scannet/d1/config.json'
+config='./experiments/scannet/dhnrgb1/config.json'
 #python3 vis.py $config scene0011_01 p  --raw
 
 ipython3 -- tc.py $config --train
